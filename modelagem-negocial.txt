@@ -1,0 +1,119 @@
+Levantar requisitos
+	Quais informações existem no contexto do sistema?
+	Times, jogadores, campeonatos, jogos.
+
+	Quais ações podem acontecer?
+	user-end
+		Visualizar informações de um campeonato
+		Visualizar informações de um time
+		Visualizar informações de um jogador
+		Visualizar informações de um jogo
+
+	admin-end
+		Cadastro de campeonato
+		Alteração de campeonato
+		Cadastro de time
+		Alteração de time
+		Cadastro de jogador
+		Alteração de jogador
+		Cadastro de jogo
+		Alteração de jogo
+
+	Quais consultas, telas, relatórios ou APIs precisarão desses dados?
+	Todos esses dados listados funcionam de forma complementar um do outro, inclusive durante consultas.
+
+	O que torna um registro único?
+	Um campeonato se torna único através de seu nome, país e ano.
+	Um time se torna único através do seu nome, país e estado.
+	Um jogador se torna único através do seu nome, país, data de nascimento, time e número da camisa.
+	Um jogo se torna único através do seu campeonato, data e times relacionados.
+
+
+
+Modelagem conceitual
+	Descrever
+		Entidades relevantes do domínio.
+		Campeonato, time, jogador, jogo.
+
+		Relações entre entidades.
+			Campeonato tem n Times
+			Time joga n Campeonatos
+
+			Campeonato tem n Jogos
+			Jogo pertence a um Campeonato
+
+			Time tem n Jogadores
+			Jogador pertence a um Time
+
+			Time joga n Jogos
+			Jogo tem 2 Times
+
+	Validar com o requisitos de negócio
+
+
+
+Modelo lógico
+	Definir para cada entidade
+		Atributos: quais propriedades precisam ser registradas.
+			Campeonato: nome, país, ano, data de início, data de término
+			Time: nome, país, estado, técnico, estádio
+			Jogador: nome, país, data de nascimento, time, posição, pé dominante, número
+			Jogo: campeonato, data, horário, time mandante, time visitante, estádio
+
+		Identificador: a chave primária que distingue cada ocorrência.
+			Campeonato: nome, país, ano
+			Time: nome, país, estado
+			Jogador: nome, país, data de nascimento, time, número
+			Jogo: campeonato, data, horário, time mandante
+
+		Relacionamentos: como uma entidade referencia outra.
+
+		Chaves estrangeiras: a representação dos relacionamentos entre tabelas.
+
+		Obrigatoriedade: quais atributos e relações aceitam ou não ausência de valor.
+
+		Unicidade: quais combinações de valores não podem se repetir.
+
+		Cardinalidade e opcionalidade: por exemplo, se uma entidade pode existir sem outra, ou se depende dela.
+
+		Ciclo de vida: como cada registro nasce, muda de estado e deixa de ser válido.
+
+
+
+Normalizar e validar
+	Avaliar se cada fato está guardado no lugar certo e apenas uma vez
+
+	Checagem rápida
+		Cada coluna guarda apenas um valor indivisível?
+
+		Há grupos repetidos de dados dentro de uma mesma tabela?
+
+		Um atributo depende da chave inteira da tabela?
+
+		Um atributo depende de outro atributo que não é chave?
+
+		Ao mudar uma informação, você precisaria atualizá-la em vários registros?
+
+		Ao excluir um registro, você perderia um fato que deveria permanecer?
+
+		É possível inserir um dado válido sem precisar inventar ou duplicar outro?
+
+
+Modelo físico
+	Nomes reais de schemas, tabelas e colunas.
+
+	Tipos do PostgreSQL para cada coluna.
+
+	PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK e valores padrão.
+
+	Estratégia de geração de identificadores.
+
+	Índices baseados nas consultas mais frequentes.
+
+	Regras de exclusão e atualização das relações, como RESTRICT, CASCADE ou SET NULL.
+
+	Estratégia de migrations, controle de versão e criação do schema.
+
+	Segurança: usuários, permissões e credenciais por ambiente.
+
+	Backup, restauração, capacidade e evolução dos dados.

@@ -1,0 +1,11 @@
+Project:       Maven
+Language:      Java
+Spring Boot:   4.1.0
+Packaging:     Jar
+Java:          21
+Configuration: YAML
+
+Group:         com.flp
+Artifact:      football-live-platform
+Name:          football-live-platform
+Package:       com.flp.footballliveplatform

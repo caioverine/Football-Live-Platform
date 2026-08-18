@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: football-live-platform
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flp_db
+    username: flp_user
+    password: flp_pwd

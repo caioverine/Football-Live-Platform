@@ -1,4 +1,4 @@
-package com.flp.football_live_platform;
+package com.flp.footballliveplatform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

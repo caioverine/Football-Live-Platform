@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: flp-postgres
+    environment:
+      POSTGRES_DB: flp_db
+      POSTGRES_USER: flp_user
+      POSTGRES_PASSWORD: flp_pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
