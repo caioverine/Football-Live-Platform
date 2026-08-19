@@ -78,51 +78,121 @@ Modelo físico
 	Nomes reais de schemas, tabelas e colunas.
 		Tabelas e Colunas: 
 			championship
-				id 				[INT] 		PK, UNIQUE, NOT NULL
-				name 			[TEXT] 		NOT NULL
-				country_id 		[INT] 		FK, NOT NULL
-				year 			[SMALLINT] 	NOT NULL
-				start_date 		[DATE] 		NOT NULL
-				end_date 		[DATE] 		NOT NULL
+				id 									[BIGINT] 		PK
+				name 								[VARCHAR(150)] 	NOT NULL
+				country_id 							[BIGINT] 		FK, NOT NULL
+
+				UNIQUE(name, country_id)
+
+			championship_season
+				id 									[BIGINT] 		PK
+				championship_id						[BIGINT]		FK, NOT NULL
+				year								[SMALLINT]		NOT NULL
+				start_date							[DATE]			NOT NULL
+				end_date							[DATE]			NOT NULL
+				status								[VARCHAR(20)]	NOT NULL
+
+				UNIQUE(championship_id, year)
+				CHECK(end_date >= start_date)
 
 			club
-				id 				[INT] 		PK, UNIQUE, NOT NULL
-				name 			[TEXT] 		NOT NULL
-				country_id 		[INT] 		FK, NOT NULL
-				state 			[TEXT] 		NOT NULL
-				coach_id 		[INT] 		FK, UNIQUE, NOT NULL
-				stadium_name 	[TEXT] 		NOT NULL
+				id 									[BIGINT] 		PK
+				name 								[VARCHAR(150)]	NOT NULL
+				country_id 							[BIGINT] 		FK, NOT NULL
+				state 								[VARCHAR(100)]
+				stadium_id 							[BIGINT] 		FK, NOT NULL
+				founded_at							[DATE]	
 
-			championship_club
-				championship_id [INT]		PK, FK, NOT NULL
-				club_id 		[INT]		PK, FK, NOT NULL
+				UNIQUE(name, country_id)
 
-			player
-				id 				[INT]		PK, UNIQUE, NOT NULL
-				name 			[TEXT]		NOT NULL
-				country_id 		[INT]		FK, NOT NULL
-				birth_date 		[DATE]		NOT NULL
-				club_id 		[INT]		FK, NOT NULL
-				shirt_number	[SMALLINT]	NOT NULL
-				position		[TEXT]		NOT NULL
-				foot 			[CHAR(1)]	NOT NULL
+			championship_season_club
+				id 									[BIGINT] 		PK
+				championship_season_id  			[BIGINT]		FK, NOT NULL
+				club_id 							[BIGINT]		FK, NOT NULL
+				registered_at						[TIMESTAMP] 	NOT NULL
+				status								[VARCHAR(20)] 	NOT NULL
 
-			game
-				id 				[INT] 		PK, UNIQUE, NOT NULL
-				championship_id [INT] 		FK, NOT NULL
-				game_date 		[TIMESTAMP]	NOT NULL
-				home_club_id 	[INT]		FK, NOT NULL
-				away_club_id 	[INT]		FK, NOT NULL
-				stadium_name 	[TEXT]		NOT NULL
-
-			country
-				id 				[INT]		PK, UNIQUE, NOT NULL
-				name 			[TEXT]		NOT NULL
+				UNIQUE(championship_season_id, club_id)	
 
 			coach
-				id 				[INT]		PK, UNIQUE, NOT NULL
-				name 			[TEXT]		NOT NULL
-				country_id		[INT]		FK, NOT NULL
+				id 									[BIGINT]		PK
+				name 								[VARCHAR(150)]	NOT NULL
+				country_id							[BIGINT]		FK, NOT NULL
+				birth_date							[DATE]	
+
+			club_coach
+				id 									[BIGINT]		PK
+				club_id 							[BIGINT]		FK, NOT NULL
+				coach_id 							[BIGINT]		FK, NOT NULL
+				start_date							[DATE]			NOT NULL
+				end_date							[DATE]
+
+				CHECK(end_date IS NULL OR end_date >= start_date)	
+
+			player
+				id 									[BIGINT]		PK
+				name 								[VARCHAR(150)]	NOT NULL
+				country_id 							[BIGINT]		FK, NOT NULL
+				birth_date 							[DATE]			NOT NULL
+				preferred_foot						[CHAR(1)]		NOT NULL
+
+				CHECK(preferred_foot IN('L', 'R', 'B'))
+				CHECK(birth_date < CURRENT_DATE)
+
+			squad_membership
+				id 									[BIGINT]		PK
+				championship_season_club_id			[BIGINT]		FK, NOT NULL
+				player_id							[BIGINT]		FK, NOT NULL
+				start_date							[DATE]			NOT NULL
+				end_date							[DATE]
+
+				UNIQUE(championship_season_club_id, player_id)
+				CHECK(end_date IS NULL OR end_date >= start_date)
+
+			squad_membership_assignment
+				id 									[BIGINT]		PK
+				squad_membership_id					[BIGINT]		FK, NOT NULL
+				shirt_number						[SMALLINT]		NOT NULL
+				position							[VARCHAR(30)]	NOT NULL
+				start_date							[DATE]			NOT NULL
+				end_date							[DATE]
+
+				CHECK(shirt_number BETWEEN 1 AND 99)
+				CHECK(end_date IS NULL OR end_date >= start_date)
+
+			game
+				id 									[BIGINT] 		PK, UNIQUE, NOT NULL
+				championship_season_id 				[BIGINT] 		FK, NOT NULL
+				scheduled_at 						[TIMESTAMP]		NOT NULL
+				home_championship_season_club_id	[BIGINT]		FK, NOT NULL
+				away_championship_season_club_id 	[BIGINT]		FK, NOT NULL
+				stadium_id 							[BIGINT]		FK, NOT NULL
+				status								[VARCHAR(20)]	NOT NULL
+				home_score							[SMALLINT]
+				away_score							[SMALLINT]
+
+				CHECK(home_championship_season_club_id <> away_championship_season_club_id)
+				CHECK(
+					(home_score IS NULL OR home_score >= 0)
+					AND
+					(away_score IS NULL OR away_score >= 0)
+				)
+
+			country
+				id 									[BIGINT]		PK
+				name 								[VARCHAR(100)]	NOT NULL, UNIQUE
+				iso_code							[CHAR(2)]		NOT NULL, UNIQUE
+
+			stadium
+				id 									[BIGINT] 		PK
+				name 								[VARCHAR(150)]	NOT NULL
+				city								[VARCHAR(100)]	NOT NULL
+				state 								[VARCHAR(100)]
+				country_id							[BIGINT]		FK, NOT NULL
+				capacity							[INTEGER]		
+
+				UNIQUE(name, city, country_id)
+				CHECK(capacity IS NULL OR capacity > 0)
 
 
 
