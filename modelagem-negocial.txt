@@ -33,7 +33,7 @@ Levantar requisitos
 Modelagem conceitual
 	Descrever
 		Entidades relevantes do domínio.
-		Campeonato, time, jogador, jogo.
+			Campeonato, time, jogador, jogo.
 
 		Relações entre entidades.
 			Campeonato tem n Times
@@ -66,47 +66,65 @@ Modelo lógico
 			Jogador: nome, país, data de nascimento, time, número
 			Jogo: campeonato, data, horário, time mandante
 
-		Relacionamentos: como uma entidade referencia outra.
+		Relacionamentos: e Chaves estrangeiras
+			Campeonato - Time [Uma terceira tabela que referencia as duas]
+			Campeonato - Jogo [Jogo usa o idCampeonato como chave estrangeira]
+			Time - Jogador 	  [Jogador usa idTime como chave estrangeira]
+			Time - Jogo       [Jogo usa idTime como chave estrangeira] [Terá 2 idsTime, um do time mandante e outro do visitante]
 
-		Chaves estrangeiras: a representação dos relacionamentos entre tabelas.
-
-		Obrigatoriedade: quais atributos e relações aceitam ou não ausência de valor.
-
-		Unicidade: quais combinações de valores não podem se repetir.
-
-		Cardinalidade e opcionalidade: por exemplo, se uma entidade pode existir sem outra, ou se depende dela.
-
-		Ciclo de vida: como cada registro nasce, muda de estado e deixa de ser válido.
-
-
-
-Normalizar e validar
-	Avaliar se cada fato está guardado no lugar certo e apenas uma vez
-
-	Checagem rápida
-		Cada coluna guarda apenas um valor indivisível?
-
-		Há grupos repetidos de dados dentro de uma mesma tabela?
-
-		Um atributo depende da chave inteira da tabela?
-
-		Um atributo depende de outro atributo que não é chave?
-
-		Ao mudar uma informação, você precisaria atualizá-la em vários registros?
-
-		Ao excluir um registro, você perderia um fato que deveria permanecer?
-
-		É possível inserir um dado válido sem precisar inventar ou duplicar outro?
 
 
 Modelo físico
 	Nomes reais de schemas, tabelas e colunas.
+		Tabelas e Colunas: 
+			championship
+				id 				[INT] 		PK, UNIQUE, NOT NULL
+				name 			[TEXT] 		NOT NULL
+				country_id 		[INT] 		FK, NOT NULL
+				year 			[SMALLINT] 	NOT NULL
+				start_date 		[DATE] 		NOT NULL
+				end_date 		[DATE] 		NOT NULL
 
-	Tipos do PostgreSQL para cada coluna.
+			club
+				id 				[INT] 		PK, UNIQUE, NOT NULL
+				name 			[TEXT] 		NOT NULL
+				country_id 		[INT] 		FK, NOT NULL
+				state 			[TEXT] 		NOT NULL
+				coach_id 		[INT] 		FK, UNIQUE, NOT NULL
+				stadium_name 	[TEXT] 		NOT NULL
 
-	PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK e valores padrão.
+			championship_club
+				championship_id [INT]		PK, FK, NOT NULL
+				club_id 		[INT]		PK, FK, NOT NULL
 
-	Estratégia de geração de identificadores.
+			player
+				id 				[INT]		PK, UNIQUE, NOT NULL
+				name 			[TEXT]		NOT NULL
+				country_id 		[INT]		FK, NOT NULL
+				birth_date 		[DATE]		NOT NULL
+				club_id 		[INT]		FK, NOT NULL
+				shirt_number	[SMALLINT]	NOT NULL
+				position		[TEXT]		NOT NULL
+				foot 			[CHAR(1)]	NOT NULL
+
+			game
+				id 				[INT] 		PK, UNIQUE, NOT NULL
+				championship_id [INT] 		FK, NOT NULL
+				game_date 		[TIMESTAMP]	NOT NULL
+				home_club_id 	[INT]		FK, NOT NULL
+				away_club_id 	[INT]		FK, NOT NULL
+				stadium_name 	[TEXT]		NOT NULL
+
+			country
+				id 				[INT]		PK, UNIQUE, NOT NULL
+				name 			[TEXT]		NOT NULL
+
+			coach
+				id 				[INT]		PK, UNIQUE, NOT NULL
+				name 			[TEXT]		NOT NULL
+				country_id		[INT]		FK, NOT NULL
+
+
 
 	Índices baseados nas consultas mais frequentes.
 
