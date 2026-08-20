@@ -113,6 +113,7 @@ Modelo físico
 				status								[VARCHAR(20)] 	NOT NULL
 
 				UNIQUE(championship_season_id, club_id)	
+				UNIQUE(id, championship_season_id)
 
 			coach
 				id 									[BIGINT]		PK
@@ -137,39 +138,107 @@ Modelo físico
 				preferred_foot						[CHAR(1)]		NOT NULL
 
 				CHECK(preferred_foot IN('L', 'R', 'B'))
-				CHECK(birth_date < CURRENT_DATE)
 
 			squad_membership
 				id 									[BIGINT]		PK
-				championship_season_club_id			[BIGINT]		FK, NOT NULL
+				championship_season_id 				[BIGINT]		NOT NULL
+				championship_season_club_id			[BIGINT]		NOT NULL
 				player_id							[BIGINT]		FK, NOT NULL
 				start_date							[DATE]			NOT NULL
 				end_date							[DATE]
 
+				FOREIGN KEY (
+					championship_season_club_id,
+					championship_season_id
+				)
+				REFERENCES championship_season_club (
+					id,
+					championship_season_id
+				)
+
 				UNIQUE(championship_season_club_id, player_id)
+				UNIQUE(id, championship_season_club_id)
+
 				CHECK(end_date IS NULL OR end_date >= start_date)
+
+				EXCLUDE USING gist (
+					championship_season_id WITH =,
+					player_id WITH =,
+					daterange(
+						start_date,
+						COALESCE(end_date, 'infinity'::date),
+						'[]'
+					) WITH &&
+				)
 
 			squad_membership_assignment
 				id 									[BIGINT]		PK
-				squad_membership_id					[BIGINT]		FK, NOT NULL
+				squad_membership_id					[BIGINT]		NOT NULL
+				championship_season_club_id 		[BIGINT]		NOT NULL
 				shirt_number						[SMALLINT]		NOT NULL
 				position							[VARCHAR(30)]	NOT NULL
 				start_date							[DATE]			NOT NULL
 				end_date							[DATE]
 
+				FOREIGN KEY (
+					squad_membership_id,
+					championship_season_club_id
+				)
+				REFERENCES squad_membership (
+					id,
+					championship_season_club_id
+				)
+
 				CHECK(shirt_number BETWEEN 1 AND 99)
 				CHECK(end_date IS NULL OR end_date >= start_date)
 
+				EXCLUDE USING gist (
+					squad_membership_id WITH =,
+					daterange(
+						start_date,
+						COALESCE(end_date, 'infinity'::date),
+						'[]'
+					) WITH &&
+				)
+
+				EXCLUDE USING gist (
+					championship_season_club_id WITH =,
+					shit_number WITH =,
+					daterange(
+						start_date,
+						COALESCE(end_date, 'infinity'::date),
+						'[]'
+					) WITH &&
+				)
+
 			game
-				id 									[BIGINT] 		PK, UNIQUE, NOT NULL
+				id 									[BIGINT] 		PK
 				championship_season_id 				[BIGINT] 		FK, NOT NULL
 				scheduled_at 						[TIMESTAMP]		NOT NULL
-				home_championship_season_club_id	[BIGINT]		FK, NOT NULL
-				away_championship_season_club_id 	[BIGINT]		FK, NOT NULL
+				home_championship_season_club_id	[BIGINT]		NOT NULL
+				away_championship_season_club_id 	[BIGINT]		NOT NULL
 				stadium_id 							[BIGINT]		FK, NOT NULL
 				status								[VARCHAR(20)]	NOT NULL
 				home_score							[SMALLINT]
 				away_score							[SMALLINT]
+
+				FOREIGN KEY (
+			        home_championship_season_club_id,
+			        championship_season_id
+			    )
+			    REFERENCES championship_season_club (
+			        id,
+			        championship_season_id
+			    )
+
+			    FOREIGN KEY (
+			        away_championship_season_club_id,
+			        championship_season_id
+			    )
+			    REFERENCES championship_season_club (
+			        id,
+			        championship_season_id
+			    )
 
 				CHECK(home_championship_season_club_id <> away_championship_season_club_id)
 				CHECK(
